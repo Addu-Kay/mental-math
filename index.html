@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental Math Master - Single & 2-Digit Trainer</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons CDN -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .math-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Subtle pulse animation for feedback */
+    @keyframes flash-correct {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    @keyframes flash-wrong {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-correct {
+      animation: flash-correct 0.3s ease-in-out;
+    }
+    .animate-wrong {
+      animation: flash-wrong 0.35s ease-in-out;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white font-black text-xl">
+          <i class="ph-bold ph-brain"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-white leading-tight flex items-center gap-2">
+            Mental Math <span id="header-difficulty-badge" class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">Foundations: 1-Digit</span>
+          </h1>
+          <p class="text-xs text-slate-400">Build instant muscle memory • Zero thinking lag</p>
+        </div>
+      </div>
+
+      <!-- Quick Session Stats -->
+      <div class="flex items-center gap-3 text-xs font-medium">
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/50">
+          <i class="ph-fill ph-fire text-amber-400 text-sm"></i>
+          <span>Streak: <b id="stat-streak" class="text-amber-400 font-bold">0</b></span>
+        </div>
+        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/50">
+          <i class="ph-bold ph-target text-emerald-400 text-sm"></i>
+          <span>Accuracy: <b id="stat-accuracy" class="text-emerald-400 font-bold">100%</b></span>
+        </div>
+        <button id="btn-reset-stats" title="Reset Session Stats" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition">
+          <i class="ph-bold ph-arrow-counter-clockwise text-base"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-5xl mx-auto px-4 py-5 flex-1 flex flex-col gap-5 w-full">
+
+    <!-- Controls Bar: Difficulty Level + Operations + Mode -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl backdrop-blur-sm flex flex-col gap-3.5">
+      
+      <!-- Top Row: Stage / Level Tabs -->
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+            <i class="ph-bold ph-stairs"></i> Level:
+          </span>
+          <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+            <button id="diff-1digit" class="diff-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
+              <i class="ph-bold ph-lightning"></i> 1-Digit Foundations (1 to 9)
+            </button>
+            <button id="diff-2digit" class="diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5">
+              <i class="ph-bold ph-sparkle"></i> 2-Digit Full (10 to 99)
+            </button>
+          </div>
+        </div>
+
+        <!-- Mode: Zen vs 100-Attempt Challenge -->
+        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800">
+          <button id="mode-zen" class="mode-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white">
+            <i class="ph-bold ph-flower-lotus mr-1"></i> Zen (Endless)
+          </button>
+          <button id="mode-challenge" class="mode-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30">
+            <i class="ph-bold ph-flag-banner mr-1"></i> <span id="challenge-btn-label">100 Attempt Drill</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Row: Operations Toggles -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
+            <i class="ph-bold ph-math-operations"></i> Ops:
+          </span>
+          <button data-op="+" class="op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30">
+            <span>+</span> Addition
+          </button>
+          <button data-op="-" class="op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30">
+            <span>−</span> Subtraction
+          </button>
+          <button data-op="*" id="op-mult-btn" class="op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-white">
+            <span>×</span> Multiplication
+          </button>
+        </div>
+
+        <div id="digit-guide-pill" class="text-[11px] font-medium text-emerald-400/90 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 hidden sm:flex items-center gap-1.5">
+          <i class="ph-bold ph-check-circle"></i>
+          <span>Drilling single-digit instincts: 7+8, 9+6, 15−7, 12−8</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Active Practice Card -->
+    <div id="card-container" class="relative bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col items-center justify-center transition-all duration-300">
+      
+      <!-- 100 Attempt Counter, Live Timer & Progress Bar -->
+      <div id="challenge-bar-wrapper" class="w-full mb-6 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800/80">
+        <div class="flex flex-wrap justify-between items-center text-xs font-bold text-slate-400 mb-2 gap-2">
+          
+          <!-- Left: Attempt Counter -->
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            <span class="text-slate-300">Drill:</span>
+            <span class="font-mono text-sm text-slate-100">
+              <b id="attempt-count-text" class="text-indigo-400 font-extrabold text-base">0</b> <span class="text-slate-500 font-normal">/ <span id="attempt-target-text">100</span></span>
+            </span>
+          </div>
+
+          <!-- Center: Best Time (PR) -->
+          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px]">
+            <i class="ph-fill ph-trophy text-amber-400 text-xs"></i>
+            <span id="best-time-label" class="text-slate-400">1-Digit PR:</span>
+            <b id="best-time-text" class="text-amber-400 font-mono">--:--</b>
+          </div>
+
+          <!-- Right: Elapsed Live Stopwatch -->
+          <div class="flex items-center gap-1.5 text-slate-200">
+            <i class="ph-bold ph-stopwatch text-indigo-400 text-sm"></i>
+            <span class="text-slate-400">Time:</span>
+            <span id="live-timer-text" class="font-mono text-base font-extrabold text-white tracking-wide">0:00</span>
+          </div>
+
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800/60">
+          <div id="attempt-progress" class="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-emerald-400 w-0 transition-all duration-300 ease-out"></div>
+        </div>
+      </div>
+
+      <!-- Operation Badge & Problem Display -->
+      <div class="flex items-center gap-2 mb-4">
+        <span id="op-label-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+          Addition
+        </span>
+        <button id="btn-skip" title="Skip problem" class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 hover:text-white border border-slate-700/60 transition">
+          Skip (Esc)
+        </button>
+      </div>
+
+      <!-- Problem Formula -->
+      <div class="math-font text-5xl sm:text-7xl font-extrabold tracking-tight text-white mb-6 flex items-center justify-center gap-3 sm:gap-5 select-none">
+        <span id="num1" class="text-slate-100">8</span>
+        <span id="operator-symbol" class="text-indigo-400 font-normal">+</span>
+        <span id="num2" class="text-slate-100">7</span>
+        <span class="text-slate-500 font-light">=</span>
+        <span class="text-slate-600 font-light hidden sm:inline">?</span>
+      </div>
+
+      <!-- Answer Input Form -->
+      <form id="answer-form" class="w-full max-w-sm flex flex-col items-center gap-3">
+        <div class="relative w-full">
+          <input
+            type="number"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            id="answer-input"
+            autocomplete="off"
+            placeholder="Type answer & Enter"
+            class="math-font w-full px-5 py-4 text-center text-3xl font-bold bg-slate-950/80 border-2 border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition shadow-inner"
+            autofocus
+          />
+        </div>
+
+        <!-- On-Screen Numeric Keypad (Optimized for Mobile/Phone thumbs) -->
+        <div id="mobile-numpad" class="w-full grid grid-cols-3 gap-2.5 mt-2">
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="1">1</button>
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="2">2</button>
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="3">3</button>
+          
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="4">4</button>
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="5">5</button>
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="6">6</button>
+          
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="7">7</button>
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="8">8</button>
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="9">9</button>
+          
+          <button type="button" id="numpad-clear" class="py-3.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 active:bg-rose-600 border border-rose-500/30 text-rose-300 active:text-white text-base font-bold transition flex items-center justify-center gap-1 shadow">
+            <i class="ph-bold ph-backspace text-lg"></i>
+          </button>
+          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="0">0</button>
+          <button type="submit" id="numpad-enter" class="py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-base transition flex items-center justify-center gap-1 shadow-lg shadow-indigo-600/30 active:scale-95">
+            <i class="ph-bold ph-arrow-right text-lg"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Feedback Banner (Correct / Incorrect) -->
+      <div id="feedback-banner" class="w-full max-w-lg mt-5 hidden transition-all duration-300">
+        <div id="feedback-card" class="p-3.5 px-4 rounded-2xl border text-sm flex items-center justify-between font-bold">
+          <span id="feedback-title" class="flex items-center gap-2 text-base"></span>
+          <span id="feedback-time" class="text-xs font-mono text-slate-400 font-normal"></span>
+        </div>
+      </div>
+
+      <!-- Set Complete & Rest Modal (Modern In-App UI replacing raw alert popup) -->
+      <div id="completion-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md rounded-3xl z-20 flex flex-col items-center justify-center p-6 text-center transition-all duration-300 hidden">
+        <div id="modal-trophy-icon" class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-3xl mb-3 shadow-lg shadow-indigo-500/10">
+          <i class="ph-bold ph-trophy"></i>
+        </div>
+        <h3 id="modal-title" class="text-xl font-extrabold text-white mb-1">Set Complete!</h3>
+        <p id="modal-subtitle" class="text-xs text-slate-400 max-w-sm mb-4">Great work! Here is your drill breakdown:</p>
+
+        <!-- Stats Grid Cards -->
+        <div class="grid grid-cols-2 gap-3 w-full max-w-xs mb-4">
+          <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
+            <span class="text-[11px] text-slate-400 uppercase font-semibold">Accuracy</span>
+            <span id="modal-score" class="text-lg font-bold text-emerald-400 font-mono">9/10 (90%)</span>
+          </div>
+          <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
+            <span class="text-[11px] text-slate-400 uppercase font-semibold">Total Time</span>
+            <span id="modal-time" class="text-lg font-bold text-indigo-400 font-mono">2 min 35s</span>
+          </div>
+        </div>
+
+        <!-- PR / Comparison Banner -->
+        <div id="modal-comparison" class="w-full max-w-xs p-2.5 rounded-xl border text-xs font-medium mb-5 bg-slate-900 border-slate-800 text-slate-300">
+          <!-- Dynamically filled: New PR or Comparison -->
+        </div>
+
+        <!-- Rest Countdown Box inside Modal -->
+        <div class="flex items-center gap-3 bg-slate-900/80 border border-slate-800/80 px-4 py-2.5 rounded-2xl mb-4">
+          <div class="flex items-center gap-1.5 text-xs text-slate-300">
+            <i class="ph-bold ph-coffee text-indigo-400 text-base"></i>
+            <span>30s Rest Countdown:</span>
+          </div>
+          <span id="rest-timer-text" class="text-xl font-extrabold font-mono text-white">30s</span>
+        </div>
+
+        <button id="btn-skip-rest" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
+          <span>Start Next Set Now</span>
+          <i class="ph-bold ph-arrow-right"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Foundation Memory Aid & Recent History -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Single-Digit Memory Cheat-Sheet (Complements & 10-Bridges) -->
+      <div class="md:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="ph-bold ph-target text-indigo-400"></i> The Core Single-Digit Reflexes
+          </h2>
+          <span class="text-xs text-indigo-400 font-medium">Memory Foundation</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <!-- 10s Complements -->
+          <div class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3.5 space-y-2">
+            <div class="font-bold text-slate-200 flex items-center gap-1.5 text-indigo-300">
+              <i class="ph-bold ph-circles-three-plus"></i> Pairs that Make 10 (Instant Recall)
+            </div>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              These must be as automatic as breathing:
+            </p>
+            <div class="math-font text-slate-300 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800/70 space-y-1">
+              <div><b>9 + 1 = 10</b> &nbsp;|&nbsp; <b>8 + 2 = 10</b></div>
+              <div><b>7 + 3 = 10</b> &nbsp;|&nbsp; <b>6 + 4 = 10</b></div>
+              <div><b>5 + 5 = 10</b></div>
+            </div>
+          </div>
+
+          <!-- Bridging Over 10 -->
+          <div class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3.5 space-y-2">
+            <div class="font-bold text-slate-200 flex items-center gap-1.5 text-emerald-300">
+              <i class="ph-bold ph-arrow-bend-double-up-right"></i> Bridging Across 10 (Addition)
+            </div>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Add to make 10, then add remainder:
+            </p>
+            <div class="math-font text-slate-300 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800/70 space-y-1">
+              <div>8 + 5 = (8 + 2) + 3 = <b>13</b></div>
+              <div>9 + 7 = (9 + 1) + 6 = <b>16</b></div>
+              <div>7 + 6 = (7 + 3) + 3 = <b>13</b></div>
+            </div>
+          </div>
+
+          <!-- Subtracting From Teens -->
+          <div class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3.5 space-y-2">
+            <div class="font-bold text-slate-200 flex items-center gap-1.5 text-amber-300">
+              <i class="ph-bold ph-minus-circle"></i> Single-Digit Subtractions (Teens)
+            </div>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Subtract down to 10 first:
+            </p>
+            <div class="math-font text-slate-300 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800/70 space-y-1">
+              <div>14 − 8 = (14 − 4) − 4 = <b>6</b></div>
+              <div>15 − 7 = (15 − 5) − 2 = <b>8</b></div>
+              <div>13 − 6 = (13 − 3) − 3 = <b>7</b></div>
+            </div>
+          </div>
+
+          <!-- Doubles + 1 -->
+          <div class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3.5 space-y-2">
+            <div class="font-bold text-slate-200 flex items-center gap-1.5 text-violet-300">
+              <i class="ph-bold ph-copy"></i> Near Doubles Shortcut
+            </div>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Use known doubles to hit neighbor sums:
+            </p>
+            <div class="math-font text-slate-300 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800/70 space-y-1">
+              <div>6 + 7 = (6 + 6) + 1 = <b>13</b></div>
+              <div>7 + 8 = (7 + 7) + 1 = <b>15</b></div>
+              <div>8 + 9 = (8 + 8) + 1 = <b>17</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session History / Recent Attempts -->
+      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i class="ph-bold ph-clock-counter-clockwise text-indigo-400"></i> Recent Log
+          </h2>
+          <span id="history-count" class="text-xs text-slate-500">0 solved</span>
+        </div>
+        <div id="history-list" class="flex-1 overflow-y-auto max-h-64 space-y-2 pr-1 text-xs">
+          <div class="text-slate-500 text-center py-8">
+            Solve problems to see your log here
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-4 text-center text-xs text-slate-600 border-t border-slate-800/60">
+    Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono">Enter</kbd> to submit, <kbd class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 font-mono">Esc</kbd> to skip.
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    // State
+    const state = {
+      difficulty: '1digit', // '1digit' | '2digit'
+      activeOps: ['+', '-'], // Default to single-digit foundation ops
+      mode: 'challenge', // 'challenge' (100 attempts) | 'zen' (endless)
+      challengeAttempts: 0,
+      challengeCorrect: 0,
+      maxChallengeAttempts: 100,
+      challengeStartTime: null,
+      challengeTimerInterval: null,
+      bestTime: {
+        '1digit': null,
+        '2digit': null
+      },
+      lastTime: {
+        '1digit': null,
+        '2digit': null
+      },
+      problemTimes: {}, // key: "a+b", value: { totalSec, count, avgSec }
+      recentProblems: [], // tracks last few problems to strictly prevent repeating the same problem in a row
+      currentProblem: null,
+      problemStartTime: null,
+      stats: {
+        total: 0,
+        correct: 0,
+        streak: 0,
+        bestStreak: 0,
+        history: []
+      }
+    };
+
+    // Load persisted stats and separate best/last times for each difficulty
+    const savedStats = localStorage.getItem('mental_math_stats_v2');
+    if (savedStats) {
+      try {
+        const parsed = JSON.parse(savedStats);
+        state.stats = { ...state.stats, ...parsed };
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Load persisted problem response times for targeted weak-spot repetition (Single-digit only)
+    const savedProblemTimes = localStorage.getItem('mental_math_problem_times_v1');
+    if (savedProblemTimes) {
+      try {
+        const rawTimes = JSON.parse(savedProblemTimes) || {};
+        // Keep ONLY single-digit entries (numbers <= 9)
+        const cleaned = {};
+        for (const [k, v] of Object.entries(rawTimes)) {
+          const parts = k.split(/[\+\-\*]/).map(n => parseInt(n, 10));
+          if (parts.length === 2 && parts[0] <= 9 && parts[1] <= 9) {
+            cleaned[k] = v;
+          }
+        }
+        state.problemTimes = cleaned;
+        localStorage.setItem('mental_math_problem_times_v1', JSON.stringify(cleaned));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // Load 1-Digit PR & Last Time
+    const saved1DigitBest = localStorage.getItem('mental_math_best_1digit');
+    if (saved1DigitBest) state.bestTime['1digit'] = parseFloat(saved1DigitBest);
+    const saved1DigitLast = localStorage.getItem('mental_math_last_1digit');
+    if (saved1DigitLast) state.lastTime['1digit'] = parseFloat(saved1DigitLast);
+
+    // Load 2-Digit PR & Last Time
+    const saved2DigitBest = localStorage.getItem('mental_math_best_2digit');
+    if (saved2DigitBest) state.bestTime['2digit'] = parseFloat(saved2DigitBest);
+    const saved2DigitLast = localStorage.getItem('mental_math_last_2digit');
+    if (saved2DigitLast) state.lastTime['2digit'] = parseFloat(saved2DigitLast);
+
+    // Migration fallback from older single PR key
+    const oldBest = localStorage.getItem('mental_math_best_time_v1');
+    if (oldBest && !state.bestTime['1digit']) {
+      state.bestTime['1digit'] = parseFloat(oldBest);
+    }
+
+    // DOM Elements
+    const num1El = document.getElementById('num1');
+    const num2El = document.getElementById('num2');
+    const opSymbolEl = document.getElementById('operator-symbol');
+    const opLabelBadge = document.getElementById('op-label-badge');
+    const headerDifficultyBadge = document.getElementById('header-difficulty-badge');
+    const digitGuidePill = document.getElementById('digit-guide-pill');
+    const answerInput = document.getElementById('answer-input');
+    const answerForm = document.getElementById('answer-form');
+    const cardContainer = document.getElementById('card-container');
+    const feedbackBanner = document.getElementById('feedback-banner');
+    const feedbackCard = document.getElementById('feedback-card');
+    const feedbackTitle = document.getElementById('feedback-title');
+    const feedbackTime = document.getElementById('feedback-time');
+    const statStreakEl = document.getElementById('stat-streak');
+    const statAccuracyEl = document.getElementById('stat-accuracy');
+    const historyList = document.getElementById('history-list');
+    const historyCount = document.getElementById('history-count');
+    const opButtons = document.querySelectorAll('.op-toggle');
+    const opMultBtn = document.getElementById('op-mult-btn');
+    const modeZenBtn = document.getElementById('mode-zen');
+    const modeChallengeBtn = document.getElementById('mode-challenge');
+    const diff1DigitBtn = document.getElementById('diff-1digit');
+    const diff2DigitBtn = document.getElementById('diff-2digit');
+    const challengeBarWrapper = document.getElementById('challenge-bar-wrapper');
+    const attemptCountText = document.getElementById('attempt-count-text');
+    const attemptTargetText = document.getElementById('attempt-target-text');
+    const attemptProgress = document.getElementById('attempt-progress');
+    const liveTimerText = document.getElementById('live-timer-text');
+    const bestTimeText = document.getElementById('best-time-text');
+    const bestTimeLabel = document.getElementById('best-time-label');
+    const challengeBtnLabel = document.getElementById('challenge-btn-label');
+    const btnSkip = document.getElementById('btn-skip');
+    const btnResetStats = document.getElementById('btn-reset-stats');
+
+    let nextProblemTimeout = null;
+
+    // Helper: Target attempts per difficulty (1-digit: 100 attempts, 2-digit: 10 attempts)
+    function getMaxAttempts() {
+      return state.difficulty === '1digit' ? 100 : 10;
+    }
+
+    // Helper: Format seconds to M:SS or M min S s
+    function formatTime(totalSeconds) {
+      if (totalSeconds == null) return '--:--';
+      const m = Math.floor(totalSeconds / 60);
+      const s = Math.floor(totalSeconds % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function formatTimeVerbose(totalSeconds) {
+      const m = Math.floor(totalSeconds / 60);
+      const s = Math.floor(totalSeconds % 60);
+      if (m === 0) return `${s}s`;
+      if (s === 0) return `${m} min`;
+      return `${m} min ${s}s`;
+    }
+
+    // Utility: Random int [min, max] inclusive
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // Generate Problem based on active difficulty
+    function generateProblem() {
+      if (state.activeOps.length === 0) {
+        state.activeOps = ['+'];
+        updateOpButtonsUI();
+      }
+
+      const op = state.activeOps[Math.floor(Math.random() * state.activeOps.length)];
+      let a, b, correctAnswer;
+      let label = '';
+      let displaySymbol = '';
+
+      // Helper: Check if problem was given in the last 6 questions
+      function isRecentlySeen(x, y, oper) {
+        return state.recentProblems.some(p => p.op === oper && ((p.a === x && p.b === y) || (p.a === y && p.b === x)));
+      }
+
+      if (state.difficulty === '1digit') {
+        // Single digit foundations: numbers 2 to 9
+        if (op === '+') {
+          // Priority repetition: ONLY for single digits, and ONLY if NOT recently seen in the last few problems
+          const slowCandidates = [];
+          for (const [key, data] of Object.entries(state.problemTimes)) {
+            if (key.includes('+')) {
+              const parts = key.split('+').map(n => parseInt(n, 10));
+              if (parts.length === 2 && parts[0] >= 2 && parts[0] <= 9 && parts[1] >= 2 && parts[1] <= 9) {
+                // Ensure no double additions
+                if (parts[0] !== parts[1] && !isRecentlySeen(parts[0], parts[1], '+')) {
+                  if (data.avgSec >= 1.8 || data.wrongCount > 0) {
+                    slowCandidates.push({ a: parts[0], b: parts[1], weight: data.avgSec + (data.wrongCount || 0) * 1.5 });
+                  }
+                }
+              }
+            }
+          }
+
+          // 30% chance to bring back a weak combination (spaced out, never back-to-back)
+          if (slowCandidates.length > 0 && Math.random() < 0.3) {
+            slowCandidates.sort((x, y) => y.weight - x.weight);
+            const pick = slowCandidates[Math.floor(Math.random() * Math.min(3, slowCandidates.length))];
+            if (Math.random() > 0.5) {
+              a = pick.a;
+              b = pick.b;
+            } else {
+              a = pick.b;
+              b = pick.a;
+            }
+          } else {
+            // Fresh non-double single digit additions: 2 to 9, where a !== b and not recently seen
+            let attempts = 0;
+            do {
+              a = randomInt(2, 9);
+              do {
+                b = randomInt(2, 9);
+              } while (a === b); // Exclude doubles
+              attempts++;
+            } while (attempts < 15 && isRecentlySeen(a, b, '+'));
+          }
+
+          correctAnswer = a + b;
+          label = 'Single-Digit Addition';
+          displaySymbol = '+';
+        } else if (op === '-') {
+          // Drill the critical single-digit subtractions:
+          // Either single - single (e.g. 9 - 4) OR teen - single (e.g. 15 - 8, 13 - 7)
+          let attempts = 0;
+          do {
+            const useTeens = Math.random() > 0.4;
+            if (useTeens) {
+              b = randomInt(4, 9);
+              const res = randomInt(2, 9);
+              a = b + res; // a between 11 and 18
+              correctAnswer = res;
+            } else {
+              a = randomInt(4, 9);
+              b = randomInt(1, a - 1);
+              correctAnswer = a - b;
+            }
+            attempts++;
+          } while (attempts < 15 && isRecentlySeen(a, b, '-'));
+
+          label = 'Single-Digit Subtraction';
+          displaySymbol = '−';
+        } else if (op === '*') {
+          let attempts = 0;
+          do {
+            a = randomInt(2, 9);
+            b = randomInt(2, 9);
+            attempts++;
+          } while (attempts < 15 && isRecentlySeen(a, b, '*'));
+
+          correctAnswer = a * b;
+          label = 'Single-Digit Multiplication';
+          displaySymbol = '×';
+        }
+      } else {
+        // 2-DIGIT MODE: Always pure random variety! Never repeat identical problems back-to-back
+        if (op === '+') {
+          let attempts = 0;
+          do {
+            a = randomInt(11, 99);
+            b = randomInt(11, 99);
+            attempts++;
+          } while (attempts < 20 && isRecentlySeen(a, b, '+'));
+
+          correctAnswer = a + b;
+          label = '2-Digit Addition';
+          displaySymbol = '+';
+        } else if (op === '-') {
+          let attempts = 0;
+          do {
+            a = randomInt(11, 99);
+            b = randomInt(11, 99);
+            if (a < b) { const temp = a; a = b; b = temp; }
+            attempts++;
+          } while (attempts < 20 && isRecentlySeen(a, b, '-'));
+
+          correctAnswer = a - b;
+          label = '2-Digit Subtraction';
+          displaySymbol = '−';
+        } else if (op === '*') {
+          let attempts = 0;
+          do {
+            a = randomInt(11, 99);
+            b = randomInt(11, 99);
+            attempts++;
+          } while (attempts < 20 && isRecentlySeen(a, b, '*'));
+
+          correctAnswer = a * b;
+          label = '2-Digit Multiplication';
+          displaySymbol = '×';
+        }
+      }
+
+      // Add to recent problem history (keep last 8 to strictly prevent repeats)
+      state.recentProblems.push({ a, b, op });
+      if (state.recentProblems.length > 8) {
+        state.recentProblems.shift();
+      }
+
+      state.currentProblem = { a, b, op, correctAnswer, label, displaySymbol };
+      state.problemStartTime = performance.now();
+
+      // Render
+      num1El.textContent = a;
+      num2El.textContent = b;
+      opSymbolEl.textContent = displaySymbol;
+      opLabelBadge.textContent = label;
+
+      if (op === '+') {
+        opLabelBadge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
+      } else if (op === '-') {
+        opLabelBadge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-amber-500/10 text-amber-400 border border-amber-500/20';
+      } else {
+        opLabelBadge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+      }
+
+      answerInput.value = '';
+      answerInput.focus();
+      feedbackBanner.classList.add('hidden');
+    }
+
+    // Handle Answer Submission
+    function handleAnswerSubmit(e) {
+      if (e) e.preventDefault();
+      const rawVal = answerInput.value.trim();
+      if (!rawVal) return;
+
+      const userAns = parseInt(rawVal, 10);
+      const elapsed = ((performance.now() - state.problemStartTime) / 1000).toFixed(1);
+      const isCorrect = userAns === state.currentProblem.correctAnswer;
+
+      // Update Global Stats
+      state.stats.total++;
+      if (isCorrect) {
+        state.stats.correct++;
+        state.stats.streak++;
+        if (state.stats.streak > state.stats.bestStreak) {
+          state.stats.bestStreak = state.stats.streak;
+        }
+      } else {
+        state.stats.streak = 0;
+      }
+
+      // Add to session history
+      state.stats.history.unshift({
+        problem: `${state.currentProblem.a} ${state.currentProblem.displaySymbol} ${state.currentProblem.b}`,
+        userAns: userAns,
+        correctAns: state.currentProblem.correctAnswer,
+        isCorrect: isCorrect,
+        time: elapsed
+      });
+      if (state.stats.history.length > 30) state.stats.history.pop();
+
+      // Track Challenge Mode Attempts (out of 100 for 1-digit, out of 10 for 2-digit)
+      const targetAttempts = getMaxAttempts();
+      if (state.mode === 'challenge') {
+        // Start live stopwatch on first submission if not running
+        if (!state.challengeStartTime) {
+          startChallengeTimer();
+        }
+        state.challengeAttempts++;
+        if (isCorrect) state.challengeCorrect++;
+        updateChallengeProgress();
+      }
+
+      // Track response times per problem to identify slower additions & weak spots
+      const pKey = `${state.currentProblem.a}${state.currentProblem.op}${state.currentProblem.b}`;
+      const elapsedNum = parseFloat(elapsed);
+      if (!state.problemTimes[pKey]) {
+        state.problemTimes[pKey] = {
+          totalSec: elapsedNum,
+          count: 1,
+          avgSec: elapsedNum,
+          wrongCount: isCorrect ? 0 : 1
+        };
+      } else {
+        const item = state.problemTimes[pKey];
+        item.totalSec += elapsedNum;
+        item.count += 1;
+        item.avgSec = parseFloat((item.totalSec / item.count).toFixed(2));
+        if (!isCorrect) item.wrongCount = (item.wrongCount || 0) + 1;
+      }
+      try {
+        localStorage.setItem('mental_math_problem_times_v1', JSON.stringify(state.problemTimes));
+      } catch (err) {}
+
+      saveStats();
+      renderStats();
+      renderHistory();
+
+      // Show Feedback
+      feedbackBanner.classList.remove('hidden');
+      if (isCorrect) {
+        cardContainer.classList.add('animate-correct');
+        setTimeout(() => cardContainer.classList.remove('animate-correct'), 300);
+
+        feedbackCard.className = 'p-3.5 px-4 rounded-2xl border text-sm flex items-center justify-between bg-emerald-950/40 border-emerald-500/40 text-emerald-200';
+        feedbackTitle.innerHTML = `<i class="ph-bold ph-check-circle text-emerald-400 text-lg"></i> Correct! (${state.currentProblem.correctAnswer})`;
+      } else {
+        cardContainer.classList.add('animate-wrong');
+        setTimeout(() => cardContainer.classList.remove('animate-wrong'), 350);
+
+        feedbackCard.className = 'p-3.5 px-4 rounded-2xl border text-sm flex items-center justify-between bg-rose-950/40 border-rose-500/40 text-rose-200';
+        feedbackTitle.innerHTML = `<i class="ph-bold ph-x-circle text-rose-400 text-lg"></i> Incorrect! Entered ${userAns}, correct is <b class="text-white underline">${state.currentProblem.correctAnswer}</b>`;
+      }
+      feedbackTime.textContent = `${elapsed}s`;
+
+      if (nextProblemTimeout) clearTimeout(nextProblemTimeout);
+
+      // Check if target attempts reached (100 for 1-digit, 10 for 2-digit)
+      if (state.mode === 'challenge' && state.challengeAttempts >= targetAttempts) {
+        stopChallengeTimer();
+        setTimeout(showChallengeCompletion, 600);
+        return;
+      }
+
+      // Hold correct confirmation for 500ms before auto-advancing
+      if (isCorrect) {
+        nextProblemTimeout = setTimeout(generateProblem, 500);
+      } else {
+        nextProblemTimeout = setTimeout(generateProblem, 1800);
+      }
+    }
+
+    function startChallengeTimer() {
+      state.challengeStartTime = performance.now();
+      if (state.challengeTimerInterval) clearInterval(state.challengeTimerInterval);
+      state.challengeTimerInterval = setInterval(() => {
+        if (!state.challengeStartTime) return;
+        const elapsedSec = (performance.now() - state.challengeStartTime) / 1000;
+        liveTimerText.textContent = formatTime(elapsedSec);
+      }, 500);
+    }
+
+    function stopChallengeTimer() {
+      if (state.challengeTimerInterval) {
+        clearInterval(state.challengeTimerInterval);
+        state.challengeTimerInterval = null;
+      }
+    }
+
+    function updateChallengeProgress() {
+      const targetAttempts = getMaxAttempts();
+      attemptCountText.textContent = state.challengeAttempts;
+      if (attemptTargetText) {
+        attemptTargetText.textContent = targetAttempts;
+      }
+      const pct = Math.min(100, Math.round((state.challengeAttempts / targetAttempts) * 100));
+      attemptProgress.style.width = `${pct}%`;
+
+      // Update PR display based on current difficulty
+      const diff = state.difficulty;
+      if (bestTimeLabel) {
+        bestTimeLabel.textContent = diff === '1digit' ? '1-Digit PR (100):' : '2-Digit PR (10):';
+      }
+      bestTimeText.textContent = formatTime(state.bestTime[diff]);
+
+      // Update challenge tab button label
+      if (challengeBtnLabel) {
+        challengeBtnLabel.textContent = diff === '1digit' ? '100 Attempt Drill' : '10 Attempt Drill';
+      }
+    }
+
+    const completionModal = document.getElementById('completion-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalSubtitle = document.getElementById('modal-subtitle');
+    const modalScore = document.getElementById('modal-score');
+    const modalTime = document.getElementById('modal-time');
+    const modalComparison = document.getElementById('modal-comparison');
+    const modalTrophyIcon = document.getElementById('modal-trophy-icon');
+    const restTimerText = document.getElementById('rest-timer-text');
+    const btnSkipRest = document.getElementById('btn-skip-rest');
+
+    let restInterval = null;
+    let audioCtx = null;
+
+    // Web Audio Sound Chime (No external audio file needed, works 100% reliably in all browsers)
+    function playAlarmSound() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6 triumphant chime
+
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+
+          gain.gain.setValueAtTime(0, now + idx * 0.12);
+          gain.gain.linearRampToValueAtTime(0.3, now + idx * 0.12 + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.45);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now + idx * 0.12);
+          osc.stop(now + idx * 0.12 + 0.5);
+        });
+      } catch (err) {
+        console.warn('Audio play error:', err);
+      }
+    }
+
+    // Dismiss completion modal and start next set
+    function endRestPeriod(withAlarm = false) {
+      if (restInterval) {
+        clearInterval(restInterval);
+        restInterval = null;
+      }
+      completionModal.classList.add('hidden');
+
+      if (withAlarm) {
+        playAlarmSound();
+      }
+
+      resetChallenge();
+      generateProblem();
+    }
+
+    if (btnSkipRest) {
+      btnSkipRest.addEventListener('click', () => {
+        endRestPeriod(false);
+      });
+    }
+
+    function showChallengeCompletion() {
+      const elapsedTotalSec = state.challengeStartTime 
+        ? Math.round((performance.now() - state.challengeStartTime) / 1000) 
+        : 0;
+      const currentFormatted = formatTimeVerbose(elapsedTotalSec);
+      const targetAttempts = getMaxAttempts();
+      const accuracy = Math.round((state.challengeCorrect / targetAttempts) * 100);
+      const diff = state.difficulty;
+      const diffLabel = diff === '1digit' ? '1-Digit Foundations' : '2-Digit Advanced';
+
+      // Populate Modal Content
+      modalTitle.textContent = `${targetAttempts}-Attempt ${diffLabel} Complete!`;
+      modalSubtitle.textContent = `Excellent mental stamina! Review your stats below:`;
+      modalScore.textContent = `${state.challengeCorrect}/${targetAttempts} (${accuracy}%)`;
+      modalTime.textContent = currentFormatted;
+
+      const lastForDiff = state.lastTime[diff];
+      const bestForDiff = state.bestTime[diff];
+      let isNewPR = false;
+
+      // Check if beat PR or last run
+      if (bestForDiff == null || elapsedTotalSec < bestForDiff) {
+        isNewPR = true;
+        state.bestTime[diff] = elapsedTotalSec;
+        localStorage.setItem(`mental_math_best_${diff}`, elapsedTotalSec.toString());
+        modalComparison.className = 'w-full max-w-xs p-2.5 rounded-xl border text-xs font-bold mb-4 bg-amber-950/40 border-amber-500/40 text-amber-300 flex items-center justify-center gap-1.5';
+        modalComparison.innerHTML = `<i class="ph-fill ph-trophy text-sm"></i> NEW ${diffLabel.toUpperCase()} PERSONAL RECORD!`;
+        modalTrophyIcon.className = 'w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-3xl mb-3 shadow-lg shadow-amber-500/20 animate-bounce';
+      }
+
+      // Save this run as last time
+      state.lastTime[diff] = elapsedTotalSec;
+      localStorage.setItem(`mental_math_last_${diff}`, elapsedTotalSec.toString());
+
+      // ONLY show the big celebration modal if you broke the PR!
+      if (isNewPR) {
+        completionModal.classList.remove('hidden');
+
+        let secondsLeft = 30;
+        restTimerText.textContent = `${secondsLeft}s`;
+
+        if (restInterval) clearInterval(restInterval);
+        restInterval = setInterval(() => {
+          secondsLeft--;
+          restTimerText.textContent = `${secondsLeft}s`;
+
+          if (secondsLeft <= 0) {
+            endRestPeriod(true); // Sound the alarm chime!
+          }
+        }, 1000);
+      } else {
+        // Normal completion: No intrusive popup screen! Just rest 30s silently, then alarm
+        startSilentRestPeriod();
+      }
+    }
+
+    // Silent rest period when PR wasn't broken (no big screen, subtle timer on card, then chime)
+    function startSilentRestPeriod() {
+      if (restInterval) clearInterval(restInterval);
+      let secondsLeft = 30;
+
+      // Show temporary rest badge in feedback card
+      feedbackBanner.classList.remove('hidden');
+      feedbackCard.className = 'p-3.5 px-4 rounded-2xl border text-sm flex items-center justify-between bg-indigo-950/50 border-indigo-500/40 text-indigo-200';
+      feedbackTitle.innerHTML = `<i class="ph-bold ph-coffee text-indigo-400 text-lg"></i> Set done! 30s rest period...`;
+      feedbackTime.textContent = `${secondsLeft}s`;
+
+      restInterval = setInterval(() => {
+        secondsLeft--;
+        feedbackTime.textContent = `${secondsLeft}s`;
+
+        if (secondsLeft <= 0) {
+          clearInterval(restInterval);
+          restInterval = null;
+          playAlarmSound();
+          resetChallenge();
+          generateProblem();
+        }
+      }, 1000);
+    }
+
+    function resetChallenge() {
+      stopChallengeTimer();
+      state.challengeAttempts = 0;
+      state.challengeCorrect = 0;
+      state.challengeStartTime = null;
+      liveTimerText.textContent = '0:00';
+      updateChallengeProgress();
+    }
+
+    function renderStats() {
+      statStreakEl.textContent = state.stats.streak;
+      const acc = state.stats.total === 0 ? 100 : Math.round((state.stats.correct / state.stats.total) * 100);
+      statAccuracyEl.textContent = `${acc}%`;
+    }
+
+    function renderHistory() {
+      historyCount.textContent = `${state.stats.total} attempted`;
+      if (state.stats.history.length === 0) {
+        historyList.innerHTML = `<div class="text-slate-500 text-center py-8">Solve problems to see your log here</div>`;
+        return;
+      }
+
+      historyList.innerHTML = state.stats.history.map(item => `
+        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950/60 border border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full ${item.isCorrect ? 'bg-emerald-400' : 'bg-rose-400'}"></span>
+            <span class="math-font font-medium text-slate-200">${item.problem}</span>
+            <span class="text-slate-500 font-mono">= ${item.correctAns}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            ${!item.isCorrect ? `<span class="text-rose-400 text-[11px] font-mono line-through">${item.userAns}</span>` : ''}
+            <span class="text-slate-500 font-mono text-[11px]">${item.time}s</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function saveStats() {
+      localStorage.setItem('mental_math_stats_v2', JSON.stringify({
+        total: state.stats.total,
+        correct: state.stats.correct,
+        streak: state.stats.streak,
+        bestStreak: state.stats.bestStreak
+      }));
+    }
+
+    function resetStats() {
+      if (confirm('Reset your session stats?')) {
+        state.stats = { total: 0, correct: 0, streak: 0, bestStreak: 0, history: [] };
+        state.problemTimes = {};
+        localStorage.removeItem('mental_math_problem_times_v1');
+        resetChallenge();
+        saveStats();
+        renderStats();
+        renderHistory();
+      }
+    }
+
+    // Difficulty Switching: 1-Digit Foundations vs 2-Digit
+    diff1DigitBtn.addEventListener('click', () => setDifficulty('1digit'));
+    diff2DigitBtn.addEventListener('click', () => setDifficulty('2digit'));
+
+    function setDifficulty(diff) {
+      state.difficulty = diff;
+      if (diff === '1digit') {
+        diff1DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5';
+        diff2DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5';
+        headerDifficultyBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20';
+        headerDifficultyBadge.textContent = 'Foundations: 1-Digit';
+        digitGuidePill.classList.remove('hidden');
+      } else {
+        diff2DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5';
+        diff1DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5';
+        headerDifficultyBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20';
+        headerDifficultyBadge.textContent = 'Advanced: 2-Digit';
+        digitGuidePill.classList.add('hidden');
+      }
+      resetChallenge();
+      generateProblem();
+    }
+
+    // Toggle Operations (+, -, *)
+    function updateOpButtonsUI() {
+      opButtons.forEach(btn => {
+        const op = btn.dataset.op;
+        const active = state.activeOps.includes(op);
+        if (active) {
+          btn.className = 'op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30';
+        } else {
+          btn.className = 'op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-white';
+        }
+      });
+    }
+
+    opButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const op = btn.dataset.op;
+        if (state.activeOps.includes(op)) {
+          if (state.activeOps.length > 1) {
+            state.activeOps = state.activeOps.filter(o => o !== op);
+          }
+        } else {
+          state.activeOps.push(op);
+        }
+        updateOpButtonsUI();
+        resetChallenge();
+        generateProblem();
+      });
+    });
+
+    // Mode Selection: Zen vs 100 Attempt Challenge
+    modeZenBtn.addEventListener('click', () => setMode('zen'));
+    modeChallengeBtn.addEventListener('click', () => setMode('challenge'));
+
+    function setMode(mode) {
+      state.mode = mode;
+      if (mode === 'zen') {
+        modeZenBtn.className = 'mode-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30';
+        modeChallengeBtn.className = 'mode-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+        challengeBarWrapper.classList.add('hidden');
+      } else {
+        modeChallengeBtn.className = 'mode-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30';
+        modeZenBtn.className = 'mode-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+        challengeBarWrapper.classList.remove('hidden');
+        resetChallenge();
+      }
+      generateProblem();
+    }
+
+    // Event Listeners
+    answerForm.addEventListener('submit', handleAnswerSubmit);
+
+    // On-Screen Mobile Numpad Event Listeners
+    const numpadButtons = document.querySelectorAll('.numpad-btn');
+    const numpadClearBtn = document.getElementById('numpad-clear');
+
+    numpadButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.dataset.val;
+        answerInput.value += val;
+        answerInput.dispatchEvent(new Event('input'));
+      });
+    });
+
+    if (numpadClearBtn) {
+      numpadClearBtn.addEventListener('click', () => {
+        answerInput.value = answerInput.value.slice(0, -1);
+        answerInput.dispatchEvent(new Event('input'));
+      });
+    }
+
+    btnSkip.addEventListener('click', () => {
+      generateProblem();
+    });
+
+    btnResetStats.addEventListener('click', resetStats);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        generateProblem();
+      }
+    });
+
+    // Initial Launch
+    renderStats();
+    renderHistory();
+    updateOpButtonsUI();
+    updateChallengeProgress();
+    setDifficulty('1digit'); // Start on the solid foundation!
+  </script>
+</body>
+</html>
