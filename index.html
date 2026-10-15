@@ -1032,6 +1032,10 @@
 
     function setDifficulty(diff) {
       state.difficulty = diff;
+      try {
+        localStorage.setItem('mental_math_preferred_diff', diff);
+      } catch (e) {}
+
       if (diff === '1digit') {
         diff1DigitBtn.className = 'diff-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-white bg-indigo-600 border-indigo-500 shadow-md shadow-indigo-600/30';
         diff2DigitBtn.className = 'diff-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-slate-300 bg-slate-950/60 border-slate-800 hover:text-white';
@@ -1092,6 +1096,10 @@
 
     function setMode(mode) {
       state.mode = mode;
+      try {
+        localStorage.setItem('mental_math_preferred_mode', mode);
+      } catch (e) {}
+
       if (mode === 'zen') {
         modeZenBtn.className = 'mode-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-white bg-indigo-600 border-indigo-500 shadow-md shadow-indigo-600/30';
         modeChallengeBtn.className = 'mode-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-slate-300 bg-slate-950/60 border-slate-800 hover:text-white';
@@ -1192,12 +1200,16 @@
       }
     });
 
-    // Initial Launch
+    // Initial Launch: restore saved difficulty & mode preferences
     renderStats();
     renderHistory();
     updateOpButtonsUI();
     updateChallengeProgress();
-    setDifficulty('1digit'); // Start on the solid foundation!
+
+    const savedPreferredDiff = localStorage.getItem('mental_math_preferred_diff') || '1digit';
+    const savedPreferredMode = localStorage.getItem('mental_math_preferred_mode') || 'challenge';
+    setDifficulty(savedPreferredDiff);
+    setMode(savedPreferredMode);
   </script>
 </body>
 </html>
