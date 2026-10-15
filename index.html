@@ -58,10 +58,9 @@
           <i class="ph-bold ph-brain"></i>
         </div>
         <div>
-          <h1 class="font-bold text-lg text-white leading-tight flex items-center gap-2">
-            Mental Math <span id="header-difficulty-badge" class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20">Foundations: 1-Digit</span>
+          <h1 class="font-bold text-lg text-white leading-tight">
+            Mental Math
           </h1>
-          <p class="text-xs text-slate-400">Build instant muscle memory • Zero thinking lag</p>
         </div>
       </div>
 
@@ -124,17 +123,6 @@
           <button data-op="+" class="op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30">
             <span>+</span> Addition
           </button>
-          <button data-op="-" class="op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30">
-            <span>−</span> Subtraction
-          </button>
-          <button data-op="*" id="op-mult-btn" class="op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-white">
-            <span>×</span> Multiplication
-          </button>
-        </div>
-
-        <div id="digit-guide-pill" class="text-[11px] font-medium text-emerald-400/90 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 hidden sm:flex items-center gap-1.5">
-          <i class="ph-bold ph-check-circle"></i>
-          <span>Drilling single-digit instincts: 7+8, 9+6, 15−7, 12−8</span>
         </div>
       </div>
 
@@ -286,82 +274,8 @@
 
     </div>
 
-    <!-- Foundation Memory Aid & Recent History -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-      <!-- Single-Digit Memory Cheat-Sheet (Complements & 10-Bridges) -->
-      <div class="md:col-span-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-lg">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="ph-bold ph-target text-indigo-400"></i> The Core Single-Digit Reflexes
-          </h2>
-          <span class="text-xs text-indigo-400 font-medium">Memory Foundation</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <!-- 10s Complements -->
-          <div class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3.5 space-y-2">
-            <div class="font-bold text-slate-200 flex items-center gap-1.5 text-indigo-300">
-              <i class="ph-bold ph-circles-three-plus"></i> Pairs that Make 10 (Instant Recall)
-            </div>
-            <p class="text-slate-400 text-[11px] leading-relaxed">
-              These must be as automatic as breathing:
-            </p>
-            <div class="math-font text-slate-300 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800/70 space-y-1">
-              <div><b>9 + 1 = 10</b> &nbsp;|&nbsp; <b>8 + 2 = 10</b></div>
-              <div><b>7 + 3 = 10</b> &nbsp;|&nbsp; <b>6 + 4 = 10</b></div>
-              <div><b>5 + 5 = 10</b></div>
-            </div>
-          </div>
-
-          <!-- Bridging Over 10 -->
-          <div class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3.5 space-y-2">
-            <div class="font-bold text-slate-200 flex items-center gap-1.5 text-emerald-300">
-              <i class="ph-bold ph-arrow-bend-double-up-right"></i> Bridging Across 10 (Addition)
-            </div>
-            <p class="text-slate-400 text-[11px] leading-relaxed">
-              Add to make 10, then add remainder:
-            </p>
-            <div class="math-font text-slate-300 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800/70 space-y-1">
-              <div>8 + 5 = (8 + 2) + 3 = <b>13</b></div>
-              <div>9 + 7 = (9 + 1) + 6 = <b>16</b></div>
-              <div>7 + 6 = (7 + 3) + 3 = <b>13</b></div>
-            </div>
-          </div>
-
-          <!-- Subtracting From Teens -->
-          <div class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3.5 space-y-2">
-            <div class="font-bold text-slate-200 flex items-center gap-1.5 text-amber-300">
-              <i class="ph-bold ph-minus-circle"></i> Single-Digit Subtractions (Teens)
-            </div>
-            <p class="text-slate-400 text-[11px] leading-relaxed">
-              Subtract down to 10 first:
-            </p>
-            <div class="math-font text-slate-300 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800/70 space-y-1">
-              <div>14 − 8 = (14 − 4) − 4 = <b>6</b></div>
-              <div>15 − 7 = (15 − 5) − 2 = <b>8</b></div>
-              <div>13 − 6 = (13 − 3) − 3 = <b>7</b></div>
-            </div>
-          </div>
-
-          <!-- Doubles + 1 -->
-          <div class="bg-slate-950/60 rounded-xl border border-slate-800/80 p-3.5 space-y-2">
-            <div class="font-bold text-slate-200 flex items-center gap-1.5 text-violet-300">
-              <i class="ph-bold ph-copy"></i> Near Doubles Shortcut
-            </div>
-            <p class="text-slate-400 text-[11px] leading-relaxed">
-              Use known doubles to hit neighbor sums:
-            </p>
-            <div class="math-font text-slate-300 bg-slate-900/90 p-2.5 rounded-lg border border-slate-800/70 space-y-1">
-              <div>6 + 7 = (6 + 6) + 1 = <b>13</b></div>
-              <div>7 + 8 = (7 + 7) + 1 = <b>15</b></div>
-              <div>8 + 9 = (8 + 8) + 1 = <b>17</b></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Session History / Recent Attempts -->
+    <!-- Recent History Log -->
+    <div class="w-full">
       <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col">
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-base font-bold text-white flex items-center gap-2">
@@ -375,7 +289,6 @@
           </div>
         </div>
       </div>
-
     </div>
 
   </main>
@@ -390,7 +303,7 @@
     // State
     const state = {
       difficulty: '1digit', // '1digit' | '2digit'
-      activeOps: ['+', '-'], // Default to single-digit foundation ops
+      activeOps: ['+'], // Addition only
       mode: 'challenge', // 'challenge' (100 attempts) | 'zen' (endless)
       challengeAttempts: 0,
       challengeCorrect: 0,
@@ -1052,15 +965,19 @@
       if (diff === '1digit') {
         diff1DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5';
         diff2DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5';
-        headerDifficultyBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20';
-        headerDifficultyBadge.textContent = 'Foundations: 1-Digit';
-        digitGuidePill.classList.remove('hidden');
+        if (headerDifficultyBadge) {
+          headerDifficultyBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20';
+          headerDifficultyBadge.textContent = 'Foundations: 1-Digit';
+        }
+        if (digitGuidePill) digitGuidePill.classList.remove('hidden');
       } else {
         diff2DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5';
         diff1DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5';
-        headerDifficultyBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20';
-        headerDifficultyBadge.textContent = 'Advanced: 2-Digit';
-        digitGuidePill.classList.add('hidden');
+        if (headerDifficultyBadge) {
+          headerDifficultyBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20';
+          headerDifficultyBadge.textContent = 'Advanced: 2-Digit';
+        }
+        if (digitGuidePill) digitGuidePill.classList.add('hidden');
       }
       resetChallenge();
       generateProblem();
