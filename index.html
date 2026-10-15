@@ -17,6 +17,15 @@
     .math-font {
       font-family: 'JetBrains Mono', monospace;
     }
+    /* Hide number input spinners */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
     /* Subtle pulse animation for feedback */
     @keyframes flash-correct {
       0% { transform: scale(1); }
@@ -160,14 +169,13 @@
         <form id="answer-form" class="w-full max-w-sm flex flex-col items-center gap-3">
           <div class="relative w-full">
             <input
-              type="number"
-              inputmode="numeric"
-              pattern="[0-9]*"
+              type="text"
+              inputmode="none"
               id="answer-input"
               autocomplete="off"
-              placeholder="Type answer & Enter"
-              class="math-font w-full px-5 py-4 text-center text-3xl font-bold bg-slate-950/80 border-2 border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition shadow-inner"
-              autofocus
+              placeholder="Tap numbers below"
+              class="math-font w-full px-5 py-4 text-center text-3xl font-bold bg-slate-950/80 border-2 border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition shadow-inner cursor-default select-none"
+              readonly
             />
           </div>
 
@@ -1172,6 +1180,15 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         generateProblem();
+      } else if (e.key >= '0' && e.key <= '9') {
+        answerInput.value += e.key;
+        answerInput.dispatchEvent(new Event('input'));
+      } else if (e.key === 'Backspace') {
+        answerInput.value = answerInput.value.slice(0, -1);
+        answerInput.dispatchEvent(new Event('input'));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        handleAnswerSubmit();
       }
     });
 
