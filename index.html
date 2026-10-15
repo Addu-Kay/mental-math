@@ -64,15 +64,28 @@
         </div>
       </div>
 
+      <!-- View Switcher Tabs -->
+      <nav class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+        <button id="nav-btn-quiz" class="nav-tab-btn px-3 py-1.5 rounded-lg transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
+          <i class="ph-bold ph-lightning"></i> Quiz
+        </button>
+        <button id="nav-btn-settings" class="nav-tab-btn px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white flex items-center gap-1.5">
+          <i class="ph-bold ph-sliders"></i> Settings
+        </button>
+        <button id="nav-btn-log" class="nav-tab-btn px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white flex items-center gap-1.5">
+          <i class="ph-bold ph-clock-counter-clockwise"></i> Log
+        </button>
+      </nav>
+
       <!-- Quick Session Stats -->
-      <div class="flex items-center gap-3 text-xs font-medium">
-        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/50">
+      <div class="flex items-center gap-2 text-xs font-medium">
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/50">
           <i class="ph-fill ph-fire text-amber-400 text-sm"></i>
-          <span>Streak: <b id="stat-streak" class="text-amber-400 font-bold">0</b></span>
+          <span><b id="stat-streak" class="text-amber-400 font-bold">0</b></span>
         </div>
-        <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/50">
+        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700/50">
           <i class="ph-bold ph-target text-emerald-400 text-sm"></i>
-          <span>Accuracy: <b id="stat-accuracy" class="text-emerald-400 font-bold">100%</b></span>
+          <span><b id="stat-accuracy" class="text-emerald-400 font-bold">100%</b></span>
         </div>
         <button id="btn-reset-stats" title="Reset Session Stats" class="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition">
           <i class="ph-bold ph-arrow-counter-clockwise text-base"></i>
@@ -84,210 +97,259 @@
   <!-- Main Container -->
   <main class="max-w-5xl mx-auto px-4 py-5 flex-1 flex flex-col gap-5 w-full">
 
-    <!-- Controls Bar: Difficulty Level + Operations + Mode -->
-    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl backdrop-blur-sm flex flex-col gap-3.5">
-      
-      <!-- Top Row: Stage / Level Tabs -->
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-            <i class="ph-bold ph-stairs"></i> Level:
-          </span>
-          <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800">
-            <button id="diff-1digit" class="diff-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5">
-              <i class="ph-bold ph-lightning"></i> 1-Digit Foundations (1 to 9)
-            </button>
-            <button id="diff-2digit" class="diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5">
-              <i class="ph-bold ph-sparkle"></i> 2-Digit Full (10 to 99)
-            </button>
+    <!-- SECTION 1: QUIZ VIEW (Pure distraction-free training screen) -->
+    <div id="view-quiz" class="app-view flex flex-col gap-5 w-full">
+      <!-- Active Practice Card -->
+      <div id="card-container" class="relative bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col items-center justify-center transition-all duration-300">
+        
+        <!-- 100 Attempt Counter, Live Timer & Progress Bar -->
+        <div id="challenge-bar-wrapper" class="w-full mb-6 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800/80">
+          <div class="flex flex-wrap justify-between items-center text-xs font-bold text-slate-400 mb-2 gap-2">
+            
+            <!-- Left: Attempt Counter -->
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+              <span class="text-slate-300">Drill:</span>
+              <span class="font-mono text-sm text-slate-100">
+                <b id="attempt-count-text" class="text-indigo-400 font-extrabold text-base">0</b> <span class="text-slate-500 font-normal">/ <span id="attempt-target-text">100</span></span>
+              </span>
+            </div>
+
+            <!-- Center: Best Time (PR) -->
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px]">
+              <i class="ph-fill ph-trophy text-amber-400 text-xs"></i>
+              <span id="best-time-label" class="text-slate-400">1-Digit PR:</span>
+              <b id="best-time-text" class="text-amber-400 font-mono">--:--</b>
+            </div>
+
+            <!-- Right: Elapsed Live Stopwatch -->
+            <div class="flex items-center gap-1.5 text-slate-200">
+              <i class="ph-bold ph-stopwatch text-indigo-400 text-sm"></i>
+              <span class="text-slate-400">Time:</span>
+              <span id="live-timer-text" class="font-mono text-base font-extrabold text-white tracking-wide">0:00</span>
+            </div>
+
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800/60">
+            <div id="attempt-progress" class="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-emerald-400 w-0 transition-all duration-300 ease-out"></div>
           </div>
         </div>
 
-        <!-- Mode: Zen vs 100-Attempt Challenge -->
-        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800">
-          <button id="mode-zen" class="mode-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white">
-            <i class="ph-bold ph-flower-lotus mr-1"></i> Zen (Endless)
-          </button>
-          <button id="mode-challenge" class="mode-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30">
-            <i class="ph-bold ph-flag-banner mr-1"></i> <span id="challenge-btn-label">100 Attempt Drill</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Bottom Row: Operations Toggles -->
-      <div class="flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mr-1 flex items-center gap-1">
-            <i class="ph-bold ph-math-operations"></i> Ops:
+        <!-- Operation Badge & Problem Display -->
+        <div class="flex items-center gap-2 mb-4">
+          <span id="op-label-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            Addition
           </span>
-          <button data-op="+" class="op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30">
-            <span>+</span> Addition
+          <button id="btn-skip" title="Skip problem" class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 hover:text-white border border-slate-700/60 transition">
+            Skip (Esc)
           </button>
         </div>
-      </div>
 
+        <!-- Problem Formula -->
+        <div class="math-font text-5xl sm:text-7xl font-extrabold tracking-tight text-white mb-6 flex items-center justify-center gap-3 sm:gap-5 select-none">
+          <span id="num1" class="text-slate-100">8</span>
+          <span id="operator-symbol" class="text-indigo-400 font-normal">+</span>
+          <span id="num2" class="text-slate-100">7</span>
+          <span class="text-slate-500 font-light">=</span>
+          <span class="text-slate-600 font-light hidden sm:inline">?</span>
+        </div>
+
+        <!-- Answer Input Form -->
+        <form id="answer-form" class="w-full max-w-sm flex flex-col items-center gap-3">
+          <div class="relative w-full">
+            <input
+              type="number"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              id="answer-input"
+              autocomplete="off"
+              placeholder="Type answer & Enter"
+              class="math-font w-full px-5 py-4 text-center text-3xl font-bold bg-slate-950/80 border-2 border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition shadow-inner"
+              autofocus
+            />
+          </div>
+
+          <!-- On-Screen Numeric Keypad (Optimized for Mobile/Phone thumbs) -->
+          <div id="mobile-numpad" class="w-full grid grid-cols-3 gap-2.5 mt-2">
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="1">1</button>
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="2">2</button>
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="3">3</button>
+            
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="4">4</button>
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="5">5</button>
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="6">6</button>
+            
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="7">7</button>
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="8">8</button>
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="9">9</button>
+            
+            <button type="button" id="numpad-clear" class="py-3.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 active:bg-rose-600 border border-rose-500/30 text-rose-300 active:text-white text-base font-bold transition flex items-center justify-center gap-1 shadow">
+              <i class="ph-bold ph-backspace text-lg"></i>
+            </button>
+            <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="0">0</button>
+            <button type="submit" id="numpad-enter" class="py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-base transition flex items-center justify-center gap-1 shadow-lg shadow-indigo-600/30 active:scale-95">
+              <i class="ph-bold ph-arrow-right text-lg"></i>
+            </button>
+          </div>
+        </form>
+
+        <!-- Feedback Banner (Correct / Incorrect) -->
+        <div id="feedback-banner" class="w-full max-w-lg mt-5 hidden transition-all duration-300">
+          <div id="feedback-card" class="p-3.5 px-4 rounded-2xl border text-sm flex items-center justify-between font-bold">
+            <span id="feedback-title" class="flex items-center gap-2 text-base"></span>
+            <span id="feedback-time" class="text-xs font-mono text-slate-400 font-normal"></span>
+          </div>
+        </div>
+
+        <!-- Set Complete & Rest Modal (Modern In-App UI replacing raw alert popup) -->
+        <div id="completion-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md rounded-3xl z-20 flex flex-col items-center justify-center p-6 text-center transition-all duration-300 hidden">
+          <div id="modal-trophy-icon" class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-3xl mb-3 shadow-lg shadow-indigo-500/10">
+            <i class="ph-bold ph-trophy"></i>
+          </div>
+          <h3 id="modal-title" class="text-xl font-extrabold text-white mb-1">Set Complete!</h3>
+          <p id="modal-subtitle" class="text-xs text-slate-400 max-w-sm mb-4">Great work! Here is your drill breakdown:</p>
+
+          <!-- Stats Grid Cards -->
+          <div class="grid grid-cols-2 gap-3 w-full max-w-xs mb-4">
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
+              <span class="text-[11px] text-slate-400 uppercase font-semibold">Accuracy</span>
+              <span id="modal-score" class="text-lg font-bold text-emerald-400 font-mono">9/10 (90%)</span>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
+              <span class="text-[11px] text-slate-400 uppercase font-semibold">Total Time</span>
+              <span id="modal-time" class="text-lg font-bold text-indigo-400 font-mono">2 min 35s</span>
+            </div>
+          </div>
+
+          <!-- PR / Comparison Banner -->
+          <div id="modal-comparison" class="w-full max-w-xs p-2.5 rounded-xl border text-xs font-medium mb-5 bg-slate-900 border-slate-800 text-slate-300">
+            <!-- Dynamically filled: New PR or Comparison -->
+          </div>
+
+          <!-- Rest Countdown Box inside Modal -->
+          <div class="flex items-center gap-3 bg-slate-900/80 border border-slate-800/80 px-4 py-2.5 rounded-2xl mb-4">
+            <div class="flex items-center gap-1.5 text-xs text-slate-300">
+              <i class="ph-bold ph-coffee text-indigo-400 text-base"></i>
+              <span>30s Rest Countdown:</span>
+            </div>
+            <span id="rest-timer-text" class="text-xl font-extrabold font-mono text-white">30s</span>
+          </div>
+
+          <button id="btn-skip-rest" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
+            <span>Start Next Set Now</span>
+            <i class="ph-bold ph-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
     </div>
 
-    <!-- Active Practice Card -->
-    <div id="card-container" class="relative bg-gradient-to-b from-slate-900 to-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl flex flex-col items-center justify-center transition-all duration-300">
-      
-      <!-- 100 Attempt Counter, Live Timer & Progress Bar -->
-      <div id="challenge-bar-wrapper" class="w-full mb-6 bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800/80">
-        <div class="flex flex-wrap justify-between items-center text-xs font-bold text-slate-400 mb-2 gap-2">
-          
-          <!-- Left: Attempt Counter -->
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-            <span class="text-slate-300">Drill:</span>
-            <span class="font-mono text-sm text-slate-100">
-              <b id="attempt-count-text" class="text-indigo-400 font-extrabold text-base">0</b> <span class="text-slate-500 font-normal">/ <span id="attempt-target-text">100</span></span>
-            </span>
-          </div>
-
-          <!-- Center: Best Time (PR) -->
-          <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px]">
-            <i class="ph-fill ph-trophy text-amber-400 text-xs"></i>
-            <span id="best-time-label" class="text-slate-400">1-Digit PR:</span>
-            <b id="best-time-text" class="text-amber-400 font-mono">--:--</b>
-          </div>
-
-          <!-- Right: Elapsed Live Stopwatch -->
-          <div class="flex items-center gap-1.5 text-slate-200">
-            <i class="ph-bold ph-stopwatch text-indigo-400 text-sm"></i>
-            <span class="text-slate-400">Time:</span>
-            <span id="live-timer-text" class="font-mono text-base font-extrabold text-white tracking-wide">0:00</span>
-          </div>
-
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800/60">
-          <div id="attempt-progress" class="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-emerald-400 w-0 transition-all duration-300 ease-out"></div>
-        </div>
-      </div>
-
-      <!-- Operation Badge & Problem Display -->
-      <div class="flex items-center gap-2 mb-4">
-        <span id="op-label-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-          Addition
-        </span>
-        <button id="btn-skip" title="Skip problem" class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 hover:text-white border border-slate-700/60 transition">
-          Skip (Esc)
-        </button>
-      </div>
-
-      <!-- Problem Formula -->
-      <div class="math-font text-5xl sm:text-7xl font-extrabold tracking-tight text-white mb-6 flex items-center justify-center gap-3 sm:gap-5 select-none">
-        <span id="num1" class="text-slate-100">8</span>
-        <span id="operator-symbol" class="text-indigo-400 font-normal">+</span>
-        <span id="num2" class="text-slate-100">7</span>
-        <span class="text-slate-500 font-light">=</span>
-        <span class="text-slate-600 font-light hidden sm:inline">?</span>
-      </div>
-
-      <!-- Answer Input Form -->
-      <form id="answer-form" class="w-full max-w-sm flex flex-col items-center gap-3">
-        <div class="relative w-full">
-          <input
-            type="number"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            id="answer-input"
-            autocomplete="off"
-            placeholder="Type answer & Enter"
-            class="math-font w-full px-5 py-4 text-center text-3xl font-bold bg-slate-950/80 border-2 border-slate-700 rounded-2xl text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition shadow-inner"
-            autofocus
-          />
-        </div>
-
-        <!-- On-Screen Numeric Keypad (Optimized for Mobile/Phone thumbs) -->
-        <div id="mobile-numpad" class="w-full grid grid-cols-3 gap-2.5 mt-2">
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="1">1</button>
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="2">2</button>
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="3">3</button>
-          
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="4">4</button>
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="5">5</button>
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="6">6</button>
-          
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="7">7</button>
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="8">8</button>
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="9">9</button>
-          
-          <button type="button" id="numpad-clear" class="py-3.5 rounded-xl bg-rose-950/40 hover:bg-rose-900/60 active:bg-rose-600 border border-rose-500/30 text-rose-300 active:text-white text-base font-bold transition flex items-center justify-center gap-1 shadow">
-            <i class="ph-bold ph-backspace text-lg"></i>
-          </button>
-          <button type="button" class="numpad-btn py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 active:bg-indigo-600 active:text-white border border-slate-700/60 text-2xl font-bold font-mono text-slate-100 transition shadow" data-val="0">0</button>
-          <button type="submit" id="numpad-enter" class="py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-base transition flex items-center justify-center gap-1 shadow-lg shadow-indigo-600/30 active:scale-95">
-            <i class="ph-bold ph-arrow-right text-lg"></i>
-          </button>
-        </div>
-      </form>
-
-      <!-- Feedback Banner (Correct / Incorrect) -->
-      <div id="feedback-banner" class="w-full max-w-lg mt-5 hidden transition-all duration-300">
-        <div id="feedback-card" class="p-3.5 px-4 rounded-2xl border text-sm flex items-center justify-between font-bold">
-          <span id="feedback-title" class="flex items-center gap-2 text-base"></span>
-          <span id="feedback-time" class="text-xs font-mono text-slate-400 font-normal"></span>
-        </div>
-      </div>
-
-      <!-- Set Complete & Rest Modal (Modern In-App UI replacing raw alert popup) -->
-      <div id="completion-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md rounded-3xl z-20 flex flex-col items-center justify-center p-6 text-center transition-all duration-300 hidden">
-        <div id="modal-trophy-icon" class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-3xl mb-3 shadow-lg shadow-indigo-500/10">
-          <i class="ph-bold ph-trophy"></i>
-        </div>
-        <h3 id="modal-title" class="text-xl font-extrabold text-white mb-1">Set Complete!</h3>
-        <p id="modal-subtitle" class="text-xs text-slate-400 max-w-sm mb-4">Great work! Here is your drill breakdown:</p>
-
-        <!-- Stats Grid Cards -->
-        <div class="grid grid-cols-2 gap-3 w-full max-w-xs mb-4">
-          <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
-            <span class="text-[11px] text-slate-400 uppercase font-semibold">Accuracy</span>
-            <span id="modal-score" class="text-lg font-bold text-emerald-400 font-mono">9/10 (90%)</span>
-          </div>
-          <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl flex flex-col items-center">
-            <span class="text-[11px] text-slate-400 uppercase font-semibold">Total Time</span>
-            <span id="modal-time" class="text-lg font-bold text-indigo-400 font-mono">2 min 35s</span>
-          </div>
-        </div>
-
-        <!-- PR / Comparison Banner -->
-        <div id="modal-comparison" class="w-full max-w-xs p-2.5 rounded-xl border text-xs font-medium mb-5 bg-slate-900 border-slate-800 text-slate-300">
-          <!-- Dynamically filled: New PR or Comparison -->
-        </div>
-
-        <!-- Rest Countdown Box inside Modal -->
-        <div class="flex items-center gap-3 bg-slate-900/80 border border-slate-800/80 px-4 py-2.5 rounded-2xl mb-4">
-          <div class="flex items-center gap-1.5 text-xs text-slate-300">
-            <i class="ph-bold ph-coffee text-indigo-400 text-base"></i>
-            <span>30s Rest Countdown:</span>
-          </div>
-          <span id="rest-timer-text" class="text-xl font-extrabold font-mono text-white">30s</span>
-        </div>
-
-        <button id="btn-skip-rest" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-indigo-600/30">
-          <span>Start Next Set Now</span>
-          <i class="ph-bold ph-arrow-right"></i>
-        </button>
-      </div>
-
-    </div>
-
-    <!-- Recent History Log -->
-    <div class="w-full">
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-base font-bold text-white flex items-center gap-2">
-            <i class="ph-bold ph-clock-counter-clockwise text-indigo-400"></i> Recent Log
+    <!-- SECTION 2: SETTINGS VIEW (Dedicated screen for Difficulty & Drill Mode) -->
+    <div id="view-settings" class="app-view hidden flex-col gap-5 w-full">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col gap-6">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2 mb-1">
+            <i class="ph-bold ph-sliders text-indigo-400"></i> Practice Settings
           </h2>
-          <span id="history-count" class="text-xs text-slate-500">0 solved</span>
+          <p class="text-xs text-slate-400">Configure your difficulty level, drill mode, and training preferences.</p>
         </div>
-        <div id="history-list" class="flex-1 overflow-y-auto max-h-64 space-y-2 pr-1 text-xs">
-          <div class="text-slate-500 text-center py-8">
+
+        <!-- Level Setting -->
+        <div class="space-y-2">
+          <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i class="ph-bold ph-stairs text-indigo-400"></i> Difficulty Level
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button id="diff-1digit" class="diff-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-white bg-indigo-600 border-indigo-500 shadow-md shadow-indigo-600/30">
+              <div>
+                <div class="font-bold text-sm flex items-center gap-1.5">
+                  <i class="ph-bold ph-lightning"></i> 1-Digit Foundations
+                </div>
+                <div class="text-[11px] opacity-80 mt-0.5">Numbers 1 to 9 • 100 Attempt Drill</div>
+              </div>
+              <i class="ph-bold ph-check-circle text-lg"></i>
+            </button>
+            <button id="diff-2digit" class="diff-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-slate-300 bg-slate-950/60 border-slate-800 hover:text-white">
+              <div>
+                <div class="font-bold text-sm flex items-center gap-1.5">
+                  <i class="ph-bold ph-sparkle"></i> 2-Digit Advanced
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Numbers 10 to 99 • 10 Attempt Drill</div>
+              </div>
+              <i class="ph-bold ph-check-circle text-lg opacity-0"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mode Setting -->
+        <div class="space-y-2">
+          <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i class="ph-bold ph-flag-banner text-indigo-400"></i> Training Mode
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button id="mode-challenge" class="mode-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-white bg-indigo-600 border-indigo-500 shadow-md shadow-indigo-600/30">
+              <div>
+                <div class="font-bold text-sm flex items-center gap-1.5">
+                  <i class="ph-bold ph-flag-banner"></i> <span id="challenge-btn-label">100 Attempt Drill</span>
+                </div>
+                <div class="text-[11px] opacity-80 mt-0.5">Timed set with PR record tracking</div>
+              </div>
+              <i class="ph-bold ph-check-circle text-lg"></i>
+            </button>
+            <button id="mode-zen" class="mode-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-slate-300 bg-slate-950/60 border-slate-800 hover:text-white">
+              <div>
+                <div class="font-bold text-sm flex items-center gap-1.5">
+                  <i class="ph-bold ph-flower-lotus"></i> Zen (Endless)
+                </div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Untimed, continuous practice</div>
+              </div>
+              <i class="ph-bold ph-check-circle text-lg opacity-0"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Operations Setting -->
+        <div class="space-y-2">
+          <label class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i class="ph-bold ph-math-operations text-indigo-400"></i> Operation
+          </label>
+          <div class="flex items-center gap-2">
+            <button data-op="+" class="op-toggle px-4 py-2.5 rounded-xl border text-sm font-bold transition flex items-center gap-2 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30">
+              <span>+</span> Addition Only
+            </button>
+          </div>
+        </div>
+
+        <button id="btn-back-to-quiz-from-settings" class="mt-2 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30">
+          <i class="ph-bold ph-arrow-left"></i> Return to Quiz
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION 3: RECENT LOG VIEW (Dedicated screen for full history log) -->
+    <div id="view-log" class="app-view hidden flex-col gap-5 w-full">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="ph-bold ph-clock-counter-clockwise text-indigo-400"></i> Problem History & Logs
+            </h2>
+            <p class="text-xs text-slate-400">Recent question attempts, solutions, and response times.</p>
+          </div>
+          <span id="history-count" class="text-xs font-mono font-semibold text-slate-400 bg-slate-950 px-3 py-1 rounded-xl border border-slate-800">0 attempted</span>
+        </div>
+
+        <div id="history-list" class="flex-1 overflow-y-auto max-h-[60vh] space-y-2.5 pr-1 text-sm">
+          <div class="text-slate-500 text-center py-12">
             Solve problems to see your log here
           </div>
         </div>
+
+        <button id="btn-back-to-quiz-from-log" class="mt-2 py-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30">
+          <i class="ph-bold ph-arrow-left"></i> Return to Quiz
+        </button>
       </div>
     </div>
 
@@ -963,16 +1025,20 @@
     function setDifficulty(diff) {
       state.difficulty = diff;
       if (diff === '1digit') {
-        diff1DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5';
-        diff2DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5';
+        diff1DigitBtn.className = 'diff-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-white bg-indigo-600 border-indigo-500 shadow-md shadow-indigo-600/30';
+        diff2DigitBtn.className = 'diff-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-slate-300 bg-slate-950/60 border-slate-800 hover:text-white';
+        diff1DigitBtn.querySelector('.ph-check-circle').classList.remove('opacity-0');
+        diff2DigitBtn.querySelector('.ph-check-circle').classList.add('opacity-0');
         if (headerDifficultyBadge) {
           headerDifficultyBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-semibold border border-emerald-500/20';
           headerDifficultyBadge.textContent = 'Foundations: 1-Digit';
         }
         if (digitGuidePill) digitGuidePill.classList.remove('hidden');
       } else {
-        diff2DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5';
-        diff1DigitBtn.className = 'diff-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white flex items-center gap-1.5';
+        diff2DigitBtn.className = 'diff-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-white bg-indigo-600 border-indigo-500 shadow-md shadow-indigo-600/30';
+        diff1DigitBtn.className = 'diff-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-slate-300 bg-slate-950/60 border-slate-800 hover:text-white';
+        diff2DigitBtn.querySelector('.ph-check-circle').classList.remove('opacity-0');
+        diff1DigitBtn.querySelector('.ph-check-circle').classList.add('opacity-0');
         if (headerDifficultyBadge) {
           headerDifficultyBadge.className = 'text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 font-semibold border border-indigo-500/20';
           headerDifficultyBadge.textContent = 'Advanced: 2-Digit';
@@ -989,9 +1055,9 @@
         const op = btn.dataset.op;
         const active = state.activeOps.includes(op);
         if (active) {
-          btn.className = 'op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30';
+          btn.className = 'op-toggle px-4 py-2.5 rounded-xl border text-sm font-bold transition flex items-center gap-2 bg-indigo-600 border-indigo-500 text-white shadow-md shadow-indigo-600/30';
         } else {
-          btn.className = 'op-toggle px-3 py-1 rounded-xl border text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-white';
+          btn.className = 'op-toggle px-4 py-2.5 rounded-xl border text-sm font-bold transition flex items-center gap-2 bg-slate-800/80 border-slate-700/60 text-slate-400 hover:text-white';
         }
       });
     }
@@ -1019,17 +1085,61 @@
     function setMode(mode) {
       state.mode = mode;
       if (mode === 'zen') {
-        modeZenBtn.className = 'mode-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30';
-        modeChallengeBtn.className = 'mode-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+        modeZenBtn.className = 'mode-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-white bg-indigo-600 border-indigo-500 shadow-md shadow-indigo-600/30';
+        modeChallengeBtn.className = 'mode-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-slate-300 bg-slate-950/60 border-slate-800 hover:text-white';
+        modeZenBtn.querySelector('.ph-check-circle').classList.remove('opacity-0');
+        modeChallengeBtn.querySelector('.ph-check-circle').classList.add('opacity-0');
         challengeBarWrapper.classList.add('hidden');
       } else {
-        modeChallengeBtn.className = 'mode-btn px-3 py-1.5 rounded-lg text-xs font-bold transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30';
-        modeZenBtn.className = 'mode-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-400 hover:text-white';
+        modeChallengeBtn.className = 'mode-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-white bg-indigo-600 border-indigo-500 shadow-md shadow-indigo-600/30';
+        modeZenBtn.className = 'mode-btn p-3.5 rounded-2xl border text-left transition flex items-center justify-between text-slate-300 bg-slate-950/60 border-slate-800 hover:text-white';
+        modeChallengeBtn.querySelector('.ph-check-circle').classList.remove('opacity-0');
+        modeZenBtn.querySelector('.ph-check-circle').classList.add('opacity-0');
         challengeBarWrapper.classList.remove('hidden');
         resetChallenge();
       }
       generateProblem();
     }
+
+    // View Switching Navigation (Quiz vs Settings vs Log)
+    const views = {
+      quiz: document.getElementById('view-quiz'),
+      settings: document.getElementById('view-settings'),
+      log: document.getElementById('view-log')
+    };
+
+    const navButtons = {
+      quiz: document.getElementById('nav-btn-quiz'),
+      settings: document.getElementById('nav-btn-settings'),
+      log: document.getElementById('nav-btn-log')
+    };
+
+    function switchView(targetView) {
+      Object.keys(views).forEach(key => {
+        if (key === targetView) {
+          views[key].classList.remove('hidden');
+          views[key].classList.add('flex');
+          navButtons[key].className = 'nav-tab-btn px-3 py-1.5 rounded-lg transition text-white bg-indigo-600 shadow-md shadow-indigo-600/30 flex items-center gap-1.5';
+        } else {
+          views[key].classList.add('hidden');
+          views[key].classList.remove('flex');
+          navButtons[key].className = 'nav-tab-btn px-3 py-1.5 rounded-lg transition text-slate-400 hover:text-white flex items-center gap-1.5';
+        }
+      });
+
+      if (targetView === 'quiz') {
+        answerInput.focus();
+      }
+    }
+
+    navButtons.quiz.addEventListener('click', () => switchView('quiz'));
+    navButtons.settings.addEventListener('click', () => switchView('settings'));
+    navButtons.log.addEventListener('click', () => switchView('log'));
+
+    const btnBackSettings = document.getElementById('btn-back-to-quiz-from-settings');
+    const btnBackLog = document.getElementById('btn-back-to-quiz-from-log');
+    if (btnBackSettings) btnBackSettings.addEventListener('click', () => switchView('quiz'));
+    if (btnBackLog) btnBackLog.addEventListener('click', () => switchView('quiz'));
 
     // Event Listeners
     answerForm.addEventListener('submit', handleAnswerSubmit);
