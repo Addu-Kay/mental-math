@@ -766,16 +766,12 @@
       // Check if target attempts reached (100 for 1-digit, 10 for 2-digit)
       if (state.mode === 'challenge' && state.challengeAttempts >= targetAttempts) {
         stopChallengeTimer();
-        setTimeout(showChallengeCompletion, 600);
+        showChallengeCompletion();
         return;
       }
 
-      // Hold correct confirmation for 500ms before auto-advancing
-      if (isCorrect) {
-        nextProblemTimeout = setTimeout(generateProblem, 500);
-      } else {
-        nextProblemTimeout = setTimeout(generateProblem, 1800);
-      }
+      // Next problem comes immediately with zero delay
+      generateProblem();
     }
 
     function startChallengeTimer() {
